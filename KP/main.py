@@ -6,7 +6,7 @@ from config import open_weather_token
 def get_weather(city, open_weather_token):
     try:
         r = requests.get(
-            f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={open_weather_token}&units=metric")
+            f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={open_weather_token}&units=metric&lang=ru")
         data = r.json()
         #pprint(data)
 
