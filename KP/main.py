@@ -16,13 +16,12 @@ def get_weather(city, open_weather_token):
         humidity = data["main"]["humidity"]
         pressure = data["main"]["pressure"]
         wind = data["wind"]["speed"]
-        general_forecast = data["weather"]["description"]
+        general_forecast = data["weather"][0]["description"]
 
         print(f"***{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}***\n"
               f"Погода в городе: {city}\nТемпература: {cur_weather}C°\nОщущается как: {feels_like}C°\n"
               f"Влажность: {humidity}%\nДавление: {pressure} мм.рт.ст\nВетер: {wind} м/c\n"
-              f"Общий прогноз: {general_forecast}"
-              )
+              f"Общий прогноз: {general_forecast}")
 
     except Exeption as ex:
         print(ex)
