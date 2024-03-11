@@ -1,24 +1,19 @@
-import requests
 import datetime
+import requests
 from config import tg_bot_token, open_weather_token
-from aiogram import Bot, types
-from aiogram.dispatcher import dispatcher
-from aiogram.utils import executor
+import telebot
 
-bot = Bot(token=tg_bot_token)
-dp = Dispatcher(bot)
+bot = telebot.TeleBot(tg_bot_token)
 
+@bot.message_handler(commands=['help', 'start'])
+def send_welcome(message):
+    bot.send_message(message.chat.id, "Привет! Напиши мне название города и я пришлю сводку погоды!")
 
-@dp.message_handler(commands=["start"])
-async def start_command(message: types.Message):
-    await message.reply("Привет! Напиши мне название города и я пришлю сводку погоды!")
-
-
-@dp.message_handler()
-async def get_weather(message: types.Message):
+@bot.message_handler(func=lambda message: True)
+def echo_message(message):
     try:
         r = requests.get(
-            f"http://api.openweathermap.org/data/2.5/weather?q={message.text}&appid={open_weather_token}&units=metric"
+            f"http://api.openweathermap.org/data/2.5/weather?q={message.text}&appid={open_weather_token}&units=metric&lang=ru"
         )
         data = r.json()
 
@@ -30,14 +25,12 @@ async def get_weather(message: types.Message):
         wind = data["wind"]["speed"]
         general_forecast = data["weather"][0]["description"]
 
-        await message.reply(f"***{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}***\n"
+        bot.send_message(message.chat.id, f"***{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}***\n"
                             f"Погода в городе: {city}\nТемпература: {cur_weather}C°\nОщущается как: {feels_like}C°\n"
                             f"Влажность: {humidity}%\nДавление: {pressure} мм.рт.ст\nВетер: {wind} м/c\n"
                             f"Общий прогноз: {general_forecast}")
 
     except Exception as e:
-        await message.reply("\U00002620 Проверьте название города \U00002620")
+        bot.send_message(message.chat.id, "\U00002620 Проверьте название города \U00002620")
 
-
-if __name__ == '__main__':
-    executor.start(dp, skip_updates=True)
+bot.infinity_polling()
